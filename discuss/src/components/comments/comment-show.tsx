@@ -8,7 +8,7 @@ import CommentCreateForm from "@/components/comments/comment-create-form";
 
 interface CommentShowProps {
   commentId: string;
-  // comments: CommentWithAuthor[];
+  comments: CommentWithAuthor[];
   postId: string;
 }
 
@@ -26,7 +26,12 @@ export default async function CommentShow({
   const children = comments.filter((c) => c.parentId === commentId);
   const renderedChildren = children.map((child) => {
     return (
-      <CommentShow key={child.id} commentId={child.id} comments={comments} />
+      <CommentShow
+        key={child.id}
+        commentId={child.id}
+        postId={postId}
+        comments={comments}
+      />
     );
   });
 

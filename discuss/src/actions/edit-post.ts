@@ -21,23 +21,14 @@ interface EditPostFormState {
   };
 }
 
-interface ButtonEnable {
-  setButtonEdit: {
-    buttonEnable?: boolean;
-  };
-}
-
 async function editPost(
   id: string,
   slug: string,
+  title: string,
+  content: string,
   formState: EditPostFormState,
   formData: FormData
 ): Promise<EditPostFormState> {
-  const result = createPostSchema.safeParse({
-    name: formData.get("name"), // 'name' is the name property passed from the form data which is described in the input field
-    description: formData.get("description"),
-  });
-
   const session = await auth();
   if (!session || !session.user) {
     return {
@@ -47,30 +38,13 @@ async function editPost(
     };
   }
 
-  if (!result.success) {
-    return {
-      errors: result.error.flatten().fieldErrors,
-    };
-  }
-
-  const topic = await db.topic.findFirst({
-    where: { slug },
-  });
-
-  if (!topic) {
-    return {
-      errors: {
-        _form: ["Topic not found"],
-      },
-    };
-  }
   let post: Post;
   try {
     post = await db.post.update({
       where: { id },
       data: {
-        title: result.data.title,
-        content: result.data.content,
+        title: title,
+        content: content,
       },
     });
   } catch (err: unknown) {
@@ -92,14 +66,5 @@ async function editPost(
   revalidatePath(paths.postShow(slug, id));
   redirect("/");
 }
-
-// async function editButtonDisplay(postId:string):<ButtonEnable> {
-//     const session = await auth();
-//   if (!session || !session.user) {
-//     return {
-//       setB
-//     };
-//   }
-// }
 
 export { editPost };

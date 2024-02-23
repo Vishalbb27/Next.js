@@ -37,13 +37,17 @@ export default async function PostShow({ postId }: PostShowProps) {
         </div>
 
         {session?.user && displayEdit && (
-          <div className="justify-between flex-col">
-            <PostEditForm postId={postId} slug={post.title} />
-            <form action={deleteSnippetAction}>
-              <Button type="submit" className="bg-red-700">
-                Delete
-              </Button>
-            </form>
+          <div className="flex justify-between">
+            <div>
+              <PostEditForm postId={postId} slug={post.topicId} post={post} />
+            </div>
+            <div>
+              <form action={deleteSnippetAction}>
+                <Button type="submit" color="danger">
+                  Delete
+                </Button>
+              </form>
+            </div>
           </div>
         )}
       </div>

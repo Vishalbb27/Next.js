@@ -12,15 +12,30 @@ import {
 
 import * as actions from "@/actions";
 import FormButton from "../common/form-button";
+import { Post } from "@prisma/client";
+import { ChangeEvent, SetStateAction, useState } from "react";
 
 interface PostCreateFormProps {
   slug: string;
   postId: string;
+  post: Post;
 }
 
-export default function PostEditForm({ postId, slug }: PostCreateFormProps) {
+export default function PostEditForm({
+  postId,
+  slug,
+  post,
+}: PostCreateFormProps) {
+
+  const [posts, setPosts] = useState(post);
+
+  const handlePostChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    setPosts((prevState) => ({ ...prevState, [name]: value }));
+  };
+
   const [formState, action] = useFormState(
-    actions.editPost.bind(null, postId, "hi"),
+    actions.editPost.bind(null, postId, slug, posts.title, posts.content),
     {
       errors: {},
     }
@@ -36,13 +51,15 @@ export default function PostEditForm({ postId, slug }: PostCreateFormProps) {
       <PopoverContent>
         <form action={action}>
           <div className="flex flex-col gap-4 p-4 w-80">
-            <h3 className="text-lg">Edit</h3>
+            <h3 className="text-lg">Edit a post</h3>
             <Input
               name="title"
               label="Title"
               labelPlacement="outside"
               placeholder="Title"
+              value={posts.title}
               isInvalid={!!formState.errors.title}
+              onChange={(e) => handlePostChange(e)}
               errorMessage={formState.errors.title?.join(", ")}
             />
             <Textarea
@@ -50,6 +67,8 @@ export default function PostEditForm({ postId, slug }: PostCreateFormProps) {
               label="Content"
               labelPlacement="outside"
               placeholder="Content"
+              defaultValue={posts.content}
+              onChange={(e) => handlePostChange(e)}
               isInvalid={!!formState.errors.content}
               errorMessage={formState.errors.content?.join(", ")}
             />
